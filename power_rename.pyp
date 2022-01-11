@@ -13,11 +13,11 @@ class SimpleRename(c4d.plugins.CommandData):
 
         obj_name = selected_objects[0].GetName()
         title = f'[{obj_name}]' if len(selected_objects) == 1 else f"[{len(selected_objects)} Elements]"
-        new_name = gui.InputDialog("Rename" + " " + title, obj_name)
+        new_name = gui.InputDialog("Power Rename" + " " + title, obj_name)
 
         for i, obj in enumerate(selected_objects):
             obj.SetName(new_name)
-        
+
         c4d.EventAdd()
 
         return True
@@ -28,7 +28,7 @@ class BatchRename(c4d.plugins.CommandData):
     def Execute(self, doc):
         dialog = BatchDialog()
         dialog._doc = doc
-        dialog.Open(c4d.DLG_TYPE_MODAL_RESIZEABLE, 132456, -1, -1, 200, 100)
+        dialog.Open(c4d.DLG_TYPE_MODAL_RESIZEABLE, 132456, -1, -1, 300, 100)
         return True
 
 
@@ -52,36 +52,56 @@ class BatchDialog(gui.GeDialog):
     _doc = None
 
     def CreateLayout(self):
-        self.SetTitle('Batch Rename')
+        self.SetTitle('Power Rename-Batch')
 
         self.GroupBegin(10000, c4d.BFH_SCALEFIT, 1, title='Method')
 
-        self.TabGroupBegin(5000, c4d.BFH_SCALEFIT, tabtype=c4d.TAB_CYCLE)
+        self.TabGroupBegin(5000, c4d.BFH_SCALEFIT, tabtype=c4d.TAB_TABS)
 
         self.GroupBegin(1000, c4d.BFH_SCALEFIT, 1, title='Set')
-        self.AddEditText(STR_SET, c4d.BFH_SCALEFIT, 100, 0)
-        self.AddCheckbox(CHECKBOX_SET, c4d.BFH_SCALEFIT, 0, 0, 'Add Index as Suffix')
-        self.AddButton(BTN_SET, c4d.BFH_SCALEFIT, 0, 0, 'Execute')
+
+        if self.GroupBegin(2001, c4d.BFH_SCALEFIT, 5, 1, '', 0):
+            self.AddStaticText(4000, c4d.BFH_CENTER, 0, 0, name='Name')
+            self.AddEditText(STR_SET, c4d.BFH_SCALEFIT, 100, 0)
+            self.AddCheckbox(CHECKBOX_SET, c4d.BFH_SCALEFIT, 0, 0, 'Add Index as Suffix')
+        self.GroupEnd()
+
+        self.AddButton(BTN_SET, c4d.BFH_SCALEFIT, 0, 0, 'OK')
         self.GroupEnd()
 
         # TAB-1
         self.GroupBegin(1001, c4d.BFH_SCALEFIT, 1, title='Prefix')
-        self.AddEditText(STR_PREFIX, c4d.BFH_SCALEFIT, 100, 0)
-        self.AddButton(BTN_PREFIX, c4d.BFH_SCALEFIT, 0, 0, 'Execute')
+        if self.GroupBegin(2001, c4d.BFH_SCALEFIT, 5, 1, '', 0):
+            self.AddStaticText(4001, c4d.BFH_CENTER, 0, 0, name='Prefix')
+            self.AddEditText(STR_PREFIX, c4d.BFH_SCALEFIT, 100, 0)
+        self.GroupEnd()
+
+        self.AddButton(BTN_PREFIX, c4d.BFH_SCALEFIT, 0, 0, 'OK')
         self.GroupEnd()
 
         # TAB-2
         self.GroupBegin(1002, c4d.BFH_SCALEFIT, 1, title='Suffix')
-        self.AddEditText(STR_SUFFIX, c4d.BFH_SCALEFIT, 100, 0)
-        self.AddButton(BTN_SUFFIX, c4d.BFH_SCALEFIT, 0, 0, 'Execute')
+        if self.GroupBegin(2001, c4d.BFH_SCALEFIT, 5, 1, '', 0):
+            self.AddStaticText(4002, c4d.BFH_CENTER, 0, 0, name='Suffix')
+            self.AddEditText(STR_SUFFIX, c4d.BFH_SCALEFIT, 100, 0)
+        self.GroupEnd()
+
+        self.AddButton(BTN_SUFFIX, c4d.BFH_SCALEFIT, 0, 0, 'OK')
         self.GroupEnd()
 
         # TAB-3
         self.GroupBegin(1003, c4d.BFH_SCALEFIT, 1, title='Replace')
-        self.AddEditText(STR_REPLACE_OLD, c4d.BFH_SCALEFIT, 100, 0)
-        self.AddStaticText(4000, c4d.BFH_CENTER, 0, 0, name='↓')
-        self.AddEditText(STR_REPLACE_NEW, c4d.BFH_SCALEFIT, 100, 0)
-        self.AddButton(BTN_REPLACE, c4d.BFH_SCALEFIT, 0, 0, 'Execute')
+        if self.GroupBegin(2001, c4d.BFH_SCALEFIT, 5, 1, '', 0):
+            self.AddStaticText(4003, c4d.BFH_CENTER, 0, 0, name='Old')
+            self.AddEditText(STR_REPLACE_OLD, c4d.BFH_SCALEFIT, 100, 0)
+        self.GroupEnd()
+
+        if self.GroupBegin(2002, c4d.BFH_SCALEFIT, 5, 1, '', 0):
+            self.AddStaticText(4004, c4d.BFH_CENTER, 0, 0, name='New')
+            self.AddEditText(STR_REPLACE_NEW, c4d.BFH_SCALEFIT, 100, 0)
+        self.GroupEnd()
+
+        self.AddButton(BTN_REPLACE, c4d.BFH_SCALEFIT, 0, 0, 'OK')
         self.GroupEnd()
 
         self.GroupEnd()  # TabGroupEnd
@@ -178,7 +198,7 @@ if __name__ == '__main__':
                                       dat=SimpleRename(),
                                       icon=icon)
     c4d.plugins.RegisterCommandPlugin(id=BATCH_RENAME_ID,
-                                      str="Power Batch Rename",
+                                      str="Power Rename-Batch",
                                       info=0,
                                       help="Viewport multiple object rename",
                                       dat=BatchRename(),
