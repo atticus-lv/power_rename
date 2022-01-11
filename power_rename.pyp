@@ -17,6 +17,8 @@ class SimpleRename(c4d.plugins.CommandData):
 
         for i, obj in enumerate(selected_objects):
             obj.SetName(new_name)
+        
+        c4d.EventAdd()
 
         return True
 
