@@ -11,18 +11,12 @@ class SimpleRename(c4d.plugins.CommandData):
         selected_objects = doc.GetActiveObjects(c4d.GETACTIVEOBJECTFLAGS_CHILDREN)
         if len(selected_objects) == 0: return
 
-        doc.StartUndo()
         obj_name = selected_objects[0].GetName()
         title = f'[{obj_name}]' if len(selected_objects) == 1 else f"[{len(selected_objects)} Elements]"
         new_name = gui.InputDialog("Rename" + " " + title, obj_name)
 
         for i, obj in enumerate(selected_objects):
             obj.SetName(new_name)
-            doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
-
-        doc.EndUndo()
-
-        c4d.EventAdd()
 
         return True
 
