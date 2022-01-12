@@ -1,5 +1,7 @@
 # log
 # v0.1 simple rename
+# v0.2 batch rename (prefix,suffix,set(index),replace)
+# v0.3 add undo system
 
 import c4d
 from c4d import plugins, gui
@@ -15,10 +17,15 @@ class SimpleRename(c4d.plugins.CommandData):
         title = f'[{obj_name}]' if len(selected_objects) == 1 else f"[{len(selected_objects)} Elements]"
         new_name = gui.InputDialog("Power Rename" + " " + title, obj_name)
 
+        doc.StartUndo()
+
         for i, obj in enumerate(selected_objects):
+            doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
             obj.SetName(new_name)
 
         c4d.EventAdd()
+
+        doc.EndUndo()
 
         return True
 
@@ -59,7 +66,7 @@ class BatchDialog(gui.GeDialog):
         self.TabGroupBegin(5000, c4d.BFH_SCALEFIT, tabtype=c4d.TAB_TABS)
 
         self.GroupBegin(1000, c4d.BFH_SCALEFIT, 1, title='Set')
-
+        # TAB-0
         if self.GroupBegin(2001, c4d.BFH_SCALEFIT, 5, 1, '', 0):
             self.AddStaticText(4000, c4d.BFH_CENTER, 0, 0, name='Name')
             self.AddEditText(STR_SET, c4d.BFH_SCALEFIT, 100, 0)
@@ -115,35 +122,48 @@ class BatchDialog(gui.GeDialog):
             pass
 
         if id == BTN_PREFIX:
+            self.doc.StartUndo()
+
             value = self.GetString(STR_PREFIX)
             self.add_prefix(selected_objects, value)
 
+            c4d.EventAdd()
+            self.doc.EndUndo()
             self.Close()
 
 
         elif id == BTN_SUFFIX:
+            self.doc.StartUndo()
+
             value = self.GetString(STR_SUFFIX)
             self.add_suffix(selected_objects, value)
 
+            c4d.EventAdd()
+            self.doc.EndUndo()
             self.Close()
 
-
         elif id == BTN_REPLACE:
+            self.doc.StartUndo()
+
             value1 = self.GetString(STR_REPLACE_OLD)
             value2 = self.GetString(STR_REPLACE_NEW)
             self.replace_string(selected_objects, value1, value2)
 
+            c4d.EventAdd()
+            self.doc.EndUndo()
             self.Close()
 
 
         elif id == BTN_SET:
+            self.doc.StartUndo()
+
             add_index = self.GetInt32(CHECKBOX_SET)
             value = self.GetString(STR_SET)
             self.set_name(selected_objects, value, add_index=add_index)
 
+            c4d.EventAdd()
+            self.doc.EndUndo()
             self.Close()
-
-        c4d.EventAdd()
 
         return True
 
@@ -151,26 +171,26 @@ class BatchDialog(gui.GeDialog):
 
     def set_name(self, objs, name, add_index=False):
         for i, obj in enumerate(objs):
-            obj.SetName(name if not add_index else name + '.' + str(i))
             self.doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
+            obj.SetName(name if not add_index else name + '.' + str(i))
 
     def add_prefix(self, objs, prefix):
         for i, obj in enumerate(objs):
-            obj.SetName(prefix + obj.GetName())
             self.doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
+            obj.SetName(prefix + obj.GetName())
 
     def add_suffix(self, objs, suffix):
         for i, obj in enumerate(objs):
-            obj.SetName(obj.GetName(), suffix)
             self.doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
+            obj.SetName(obj.GetName(), suffix)
 
     def replace_string(self, objs, old, new):
         for i, obj in enumerate(objs):
             old_name = obj.GetName()
             if old in old_name:
                 new_name = old_name.replace(old, new)
-                obj.SetName(new_name)
                 self.doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
+                obj.SetName(new_name)
 
 
 SIMPLE_RENAME_ID = 1058816
