@@ -1,5 +1,14 @@
-Power Rename is a quick rename tool for cinema 4d
+### Power Rename v0.3
+> Power Rename is a quick rename plugin for cinema 4d
+> Now support rename objects
 
+### Install
+> Only support R23 and higher
+
+Get plugin from release
+Extract it to c4d's plugin folder
+
+### Intro
 + Power Rename
 
   + Set name to selected objects
