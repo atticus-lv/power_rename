@@ -1,7 +1,12 @@
 # log
-# v0.1 simple rename
-# v0.2 batch rename (prefix,suffix,set(index),replace)
-# v0.3 add undo system
+# v0.1
+# simple rename
+# v0.2
+# batch rename (prefix,suffix,set(index),replace)
+# v0.3
+# add undo system
+# v0.31
+# fix suffix error
 
 import c4d
 from c4d import plugins, gui
@@ -182,7 +187,7 @@ class BatchDialog(gui.GeDialog):
     def add_suffix(self, objs, suffix):
         for i, obj in enumerate(objs):
             self.doc.AddUndo(c4d.UNDOTYPE_CHANGE_SMALL, obj)
-            obj.SetName(obj.GetName(), suffix)
+            obj.SetName(obj.GetName() + suffix)
 
     def replace_string(self, objs, old, new):
         for i, obj in enumerate(objs):
